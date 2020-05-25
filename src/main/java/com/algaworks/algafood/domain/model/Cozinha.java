@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ import lombok.Setter;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@JsonRootName("cozinha")
 @Entity
 @Table(name = "cozinha")
 public class Cozinha {
@@ -28,7 +30,7 @@ public class Cozinha {
 	private Long id;
 	
 	//@JsonIgnore
-	@JsonProperty("titulo")
+	//@JsonProperty("titulo")
 	@Column
 	private String nome;
 
