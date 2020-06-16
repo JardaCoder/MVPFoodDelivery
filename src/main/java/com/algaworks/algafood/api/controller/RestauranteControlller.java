@@ -3,6 +3,7 @@ package com.algaworks.algafood.api.controller;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,15 +39,15 @@ public class RestauranteControlller {
 	
 	@GetMapping
 	public ResponseEntity<List<Restaurante>> listar(){
-		return ResponseEntity.ok().body(restauranteRepository.listar());
+		return ResponseEntity.ok().body(restauranteRepository.findAll());
 	}
 	
 	@GetMapping("/{restauranteId}")
 	public ResponseEntity<Restaurante> buscar(@PathVariable("restauranteId") Long id){
-		Restaurante restaurante = restauranteRepository.buscarPorId(id);
+		Optional <Restaurante> restaurante = restauranteRepository.findById(id);
 		
-		if (restaurante !=  null) {
-			return ResponseEntity.ok(restaurante);
+		if (restaurante.isPresent()) {
+			return ResponseEntity.ok(restaurante.get());
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -90,17 +91,16 @@ public class RestauranteControlller {
 	@PatchMapping("/{restauranteId}")
 	public ResponseEntity<?> editarParcialmente(@PathVariable("restauranteId") Long id, @RequestBody Map<String, Object> campos ){
 		try {
-			Restaurante restauranteAtual = restauranteRepository.buscarPorId(id);
+			Optional <Restaurante> restauranteAtual = restauranteRepository.findById(id);
 			
-			if(restauranteAtual == null) {
+			if(restauranteAtual.isEmpty()) {
 				return ResponseEntity.notFound().build();
 			}
 			
-			merge(campos, restauranteAtual);
+			merge(campos, restauranteAtual.get());
+			cadastroRestaurante.editar(restauranteAtual.get(), id);
 			
-			editar(id, restauranteAtual);
-			
-			return ResponseEntity.ok().body(restauranteAtual);
+			return ResponseEntity.ok().body(restauranteAtual.get());
 			
 		}catch (EntidadeNaoEncontradaException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());

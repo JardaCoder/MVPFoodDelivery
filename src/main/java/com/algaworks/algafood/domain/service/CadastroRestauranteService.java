@@ -1,5 +1,7 @@
 package com.algaworks.algafood.domain.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,12 +31,12 @@ public class CadastroRestauranteService {
 		
 		restaurante.setCozinha(cozinha);
 		
-		return restauranteRepository.salvarOuAdicionar(restaurante);
+		return restauranteRepository.save(restaurante);
 	}
 	
 	public void excluir (Long cozinhaId) {
 		try {
-			restauranteRepository.remover(cozinhaId);
+			restauranteRepository.deleteById(cozinhaId);
 			
 		}catch (EmptyResultDataAccessException e) {
 			throw new EntidadeNaoEncontradaException(String.format(
@@ -47,17 +49,18 @@ public class CadastroRestauranteService {
 	}
 	
 	public Restaurante editar (Restaurante restaurante, Long restauranteId) {
-		Restaurante restauranteAtual = restauranteRepository.buscarPorId(restauranteId);
+		Optional <Restaurante> restauranteAtual = restauranteRepository.findById(restauranteId);
 		
-		if (restauranteAtual == null) {
+		if (restauranteAtual.isEmpty()) {
 			throw new EntidadeNaoEncontradaException(
 					String.format("Restaurante de código %d não exite", restauranteId));
 		}
 		
-		BeanUtils.copyProperties(restaurante, restauranteAtual, "id");
-		restauranteAtual = salvar(restauranteAtual);
+		BeanUtils.copyProperties(restaurante, restauranteAtual.get(), "id");
 		
-		return restauranteAtual;
+		Restaurante restauranteSalvo = salvar(restauranteAtual.get());
+		return restauranteSalvo;
+		
 	}
 
 	public Restaurante editarParcialmente(Restaurante restaurante, Long id) {

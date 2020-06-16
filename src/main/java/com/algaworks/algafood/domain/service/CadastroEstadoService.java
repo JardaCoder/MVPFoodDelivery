@@ -1,5 +1,7 @@
 package com.algaworks.algafood.domain.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,12 +20,12 @@ public class CadastroEstadoService {
 	private EstadoRepository estadoRepository;
 	
 	public Estado salvar(Estado estado) {
-		return estadoRepository.salvarOuAdicionar(estado);
+		return estadoRepository.save(estado);
 	}
 	
 	public void excluir (Long estadoId) {
 		try {
-			estadoRepository.remover(estadoId);
+			estadoRepository.deleteById(estadoId);
 			
 		}catch (EmptyResultDataAccessException e) {
 			throw new EntidadeNaoEncontradaException(String.format(
@@ -37,16 +39,16 @@ public class CadastroEstadoService {
 	}
 	
 	public Estado editar (Estado estado, Long estadoId) {
-		Estado estadoAtual = estadoRepository.buscarPorId(estadoId);
+		Optional <Estado> estadoAtual = estadoRepository.findById(estadoId);
 		
-		if (estadoAtual == null) {
+		if (estadoAtual.isEmpty()) {
 			throw new EntidadeNaoEncontradaException(
 					String.format("Estado de código %d não exite", estadoId));
 		}
 		
-		BeanUtils.copyProperties(estado, estadoAtual, "id");
-		estadoAtual = salvar(estadoAtual);
+		BeanUtils.copyProperties(estado, estadoAtual.get(), "id");
+		Estado estadoSalvo = salvar(estadoAtual.get());
 		
-		return estadoAtual;
+		return estadoSalvo;
 	}
 }
