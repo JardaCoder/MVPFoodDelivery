@@ -56,7 +56,7 @@ public class CadastroRestauranteService {
 					String.format("Restaurante de código %d não exite", restauranteId));
 		}
 		
-		BeanUtils.copyProperties(restaurante, restauranteAtual.get(), "id");
+		BeanUtils.copyProperties(restaurante, restauranteAtual.get(), "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
 		
 		Restaurante restauranteSalvo = salvar(restauranteAtual.get());
 		return restauranteSalvo;

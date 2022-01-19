@@ -8,21 +8,19 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonRootName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@JsonRootName("cozinha")
 @Entity
-@Table(name = "cozinha")
-public class Cozinha {
+@Table(name = "grupo")
+public class Grupo {
 	
 	
 	@EqualsAndHashCode.Include
@@ -30,9 +28,12 @@ public class Cozinha {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	//@JsonIgnore
-	//@JsonProperty("titulo")
-	@Column
+    @Column(nullable = false)
 	private String nome;
-	
+
+	@ManyToMany
+	@JoinTable(name = "grupo_permissao", 
+	joinColumns = @JoinColumn(name = "grupo_id"),
+	inverseJoinColumns =  @JoinColumn(name = "permissao_id"))
+	private List<Permissao> permissoes = new ArrayList<Permissao>();
 }
