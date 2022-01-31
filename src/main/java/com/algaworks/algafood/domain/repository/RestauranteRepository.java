@@ -14,6 +14,8 @@ import com.algaworks.algafood.domain.model.Restaurante;
 @Repository
 public interface RestauranteRepository extends CustomJpaRepository<Restaurante, Long>, RestauranteRepositoryQueries,
 JpaSpecificationExecutor<Restaurante> {
+	
+	String fetchFormasPagamaento =  "LEFT JOIN FETCH r.formasPagamento";
 
 	List<Restaurante> findByTaxaFreteBetween(BigDecimal taxaInicial, BigDecimal taxaFinal);
 	
@@ -28,7 +30,7 @@ JpaSpecificationExecutor<Restaurante> {
 	
 	int countByCozinhaId(Long cozinhaId);
 	
-	@Query("FROM Restaurante r LEFT JOIN FETCH r.cozinha LEFT JOIN FETCH r.formasPagamento")
+	@Query("FROM Restaurante r LEFT JOIN FETCH r.cozinha")
 	List<Restaurante> findAll();
 	
 }
