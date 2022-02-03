@@ -17,15 +17,26 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.algaworks.algafood.core.validation.Groups;
+import com.algaworks.algafood.core.validation.Multiplo;
+import com.algaworks.algafood.core.validation.ValorZeroIncluiDescricao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+@ValorZeroIncluiDescricao(valorField = "taxaFrete",
+	descricaoField = "nome", descricaoObrigatoria = "Frete grátis")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -38,9 +49,12 @@ public class Restaurante {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotBlank
 	@Column(nullable = false)
 	private String nome;
 	
+	@NotNull
+	@PositiveOrZero
 	@Column (name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
 	
@@ -48,6 +62,9 @@ public class Restaurante {
 	
 	//@JsonIgnore
 	//@JsonIgnoreProperties({"hibernateLazyInitializer"})
+	@ConvertGroup(from = Default.class, to = Groups.CozinhaId.class)
+	@Valid
+	@NotNull
 	@ManyToOne //(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cozinha_id", nullable = false)
 	private Cozinha cozinha;

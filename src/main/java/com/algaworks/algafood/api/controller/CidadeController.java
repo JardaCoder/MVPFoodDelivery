@@ -2,6 +2,8 @@ package com.algaworks.algafood.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,7 @@ public class CidadeController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Cidade> criar(@RequestBody Cidade cidade) {
+	public ResponseEntity<Cidade> criar(@RequestBody @Valid  Cidade cidade) {
 		
 		try {
 			cidade = cadastroCidade.salvar(cidade);
@@ -54,7 +56,7 @@ public class CidadeController {
 	}
 
 	@PutMapping("/{cidadeId}")
-	public Cidade editar(@PathVariable("cidadeId") Long id, @RequestBody Cidade cidade) {
+	public Cidade editar(@PathVariable("cidadeId") Long id, @RequestBody @Valid Cidade cidade) {
 		return cadastroCidade.editar(cidade, id);
 	}
 

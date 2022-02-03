@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.NegocioException;
+import com.algaworks.algafood.domain.exception.ValidacaoException;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
@@ -40,6 +44,8 @@ public class RestauranteControlller {
 	private RestauranteRepository restauranteRepository;
 	@Autowired
 	private CadastroRestauranteService cadastroRestaurante;
+	@Autowired
+	private SmartValidator validator;
 
 	@GetMapping
 	public ResponseEntity<List<Restaurante>> listar() {
@@ -55,7 +61,7 @@ public class RestauranteControlller {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> criar(@RequestBody Restaurante restaurante) {
+	public ResponseEntity<?> criar(@RequestBody @Valid Restaurante restaurante) {
 		
 		try {
 			restaurante = cadastroRestaurante.salvar(restaurante);
@@ -73,7 +79,7 @@ public class RestauranteControlller {
 	}
 
 	@PutMapping("/{restauranteId}")
-	public Restaurante editar(@PathVariable("restauranteId") Long id, @RequestBody Restaurante restaurante) {
+	public Restaurante editar(@PathVariable("restauranteId") Long id, @RequestBody @Valid Restaurante restaurante) {
 		return cadastroRestaurante.editar(restaurante, id);
 	}
 
@@ -83,10 +89,23 @@ public class RestauranteControlller {
 		Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(id);
 
 		merge(campos, restauranteAtual, request);
+		validate(restauranteAtual, "restaurante");
+		
 		cadastroRestaurante.editar(restauranteAtual, id);
 
 		return ResponseEntity.ok().body(restauranteAtual);
 
+	}
+
+	private void validate(Restaurante restaurante, String objectName) {
+		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restaurante, objectName);
+		
+		validator.validate(restaurante, bindingResult);
+		
+		if(bindingResult.hasErrors()) {
+			throw new ValidacaoException(bindingResult);
+		}
+		
 	}
 
 	@SuppressWarnings("deprecation")
