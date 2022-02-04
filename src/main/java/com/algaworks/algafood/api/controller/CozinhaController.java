@@ -35,8 +35,8 @@ public class CozinhaController {
 	
 	
 	@GetMapping
-	public ResponseEntity<List<Cozinha>> listar(){
-		return ResponseEntity.ok().body(cozinhaRepository.findAll());
+	public List<Cozinha> listar(){
+		return cozinhaRepository.findAll();
 	}
 	
 	@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)

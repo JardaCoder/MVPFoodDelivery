@@ -1,0 +1,7 @@
+{
+	"nome":"Batata Recheada",
+    "taxaFrete": 10.00,
+    "cozinha": {
+      "id": 100
+    }
+ }
