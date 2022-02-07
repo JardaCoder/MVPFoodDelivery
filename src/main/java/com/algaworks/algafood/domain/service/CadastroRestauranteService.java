@@ -40,7 +40,7 @@ public class CadastroRestauranteService {
 	public void excluir (Long restauranteId) {
 		try {
 			restauranteRepository.deleteById(restauranteId);
-			
+			restauranteRepository.flush();
 		}catch (EmptyResultDataAccessException e) {
 			throw new RestauranteNaoEncontradoException(restauranteId);
 			
@@ -50,6 +50,7 @@ public class CadastroRestauranteService {
 		}
 	}
 	
+	@Deprecated
 	public Restaurante editar (Restaurante restaurante, Long restauranteId) {
 		
 		try {

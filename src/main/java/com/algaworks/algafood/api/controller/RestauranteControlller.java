@@ -10,7 +10,6 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
@@ -27,6 +26,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.assembler.RestauranteDtoAssembler;
+import com.algaworks.algafood.api.disassembler.RestauranteInputDtoDisassembler;
+import com.algaworks.algafood.api.model.RestauranteDto;
+import com.algaworks.algafood.api.model.input.RestauranteInputDto;
 import com.algaworks.algafood.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.NegocioException;
 import com.algaworks.algafood.domain.exception.ValidacaoException;
@@ -46,30 +49,38 @@ public class RestauranteControlller {
 	private CadastroRestauranteService cadastroRestaurante;
 	@Autowired
 	private SmartValidator validator;
+	@Autowired
+	private RestauranteDtoAssembler restauranteDtoAssembler;
+	@Autowired
+	private RestauranteInputDtoDisassembler restauranteInputDtoDisassembler;
 
 	@GetMapping
-	public ResponseEntity<List<Restaurante>> listar() {
+	public List<RestauranteDto> listar() {
 
 		List<Restaurante> restaurantes = restauranteRepository.findAll();
 
-		return ResponseEntity.ok().body(restaurantes);
+		return restauranteDtoAssembler.restaurantesToListRestauranteDto(restaurantes);
 	}
 
 	@GetMapping("/{restauranteId}")
-	public Restaurante buscar(@PathVariable("restauranteId") Long id) {
-		return cadastroRestaurante.buscarOuFalhar(id);
+	public RestauranteDto buscar(@PathVariable("restauranteId") Long id) {
+		var restaurante = cadastroRestaurante.buscarOuFalhar(id);
+		
+		return restauranteDtoAssembler.restauranteToRestauranteDto(restaurante);
 	}
 
 	@PostMapping
-	public ResponseEntity<?> criar(@RequestBody @Valid Restaurante restaurante) {
+	public RestauranteDto criar(@RequestBody @Valid RestauranteInputDto restauranteInputDto) {
 		
 		try {
+			Restaurante restaurante = restauranteInputDtoDisassembler.restauranteInputDtoToRestaurante(restauranteInputDto);
 			restaurante = cadastroRestaurante.salvar(restaurante);
+			return restauranteDtoAssembler.restauranteToRestauranteDto(restaurante);
+			
 		} catch (CozinhaNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage(), e);
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(restaurante);
 	}
 
 	@DeleteMapping("/{cozinhaId}")
@@ -79,12 +90,17 @@ public class RestauranteControlller {
 	}
 
 	@PutMapping("/{restauranteId}")
-	public Restaurante editar(@PathVariable("restauranteId") Long id, @RequestBody @Valid Restaurante restaurante) {
-		return cadastroRestaurante.editar(restaurante, id);
+	public RestauranteDto editar(@PathVariable("restauranteId") Long restauranteId, @Valid @RequestBody RestauranteInputDto restauranteInputDto) {
+		
+		Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
+		restauranteInputDtoDisassembler.copyToDomainObject(restauranteInputDto, restauranteAtual);
+		
+		return restauranteDtoAssembler.restauranteToRestauranteDto(restauranteAtual);
 	}
 
+	@Deprecated
 	@PatchMapping("/{restauranteId}")
-	public ResponseEntity<?> editarParcialmente(@PathVariable("restauranteId") Long id,
+	public RestauranteDto editarParcialmente(@PathVariable("restauranteId") Long id,
 			@RequestBody Map<String, Object> campos, HttpServletRequest request) {
 		Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(id);
 
@@ -93,7 +109,7 @@ public class RestauranteControlller {
 		
 		cadastroRestaurante.editar(restauranteAtual, id);
 
-		return ResponseEntity.ok().body(restauranteAtual);
+		return restauranteDtoAssembler.restauranteToRestauranteDto(restauranteAtual);
 
 	}
 
@@ -108,7 +124,6 @@ public class RestauranteControlller {
 		
 	}
 
-	@SuppressWarnings("deprecation")
 	private void merge(Map<String, Object> camposOrigem, Restaurante restauranteDestino, HttpServletRequest request) {
 		
 		ServletServerHttpRequest serverHttpRequest =  new ServletServerHttpRequest(request);
@@ -136,4 +151,8 @@ public class RestauranteControlller {
 			throw new HttpMessageNotReadableException(e.getMessage(), rootCause, serverHttpRequest);
 		}
 	}
+	
 }
+
+
+

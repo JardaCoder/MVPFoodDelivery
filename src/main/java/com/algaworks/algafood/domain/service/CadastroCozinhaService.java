@@ -29,6 +29,7 @@ public class CadastroCozinhaService {
 	public void excluir (Long cozinhaId) {
 		try {
 			cozinhaRepository.deleteById(cozinhaId);
+			cozinhaRepository.flush();
 			
 		}catch (EmptyResultDataAccessException e) {
 			throw new CozinhaNaoEncontradaException(cozinhaId);
@@ -40,6 +41,7 @@ public class CadastroCozinhaService {
 		
 	}
 
+	@Deprecated
 	public Cozinha editar(Cozinha cozinha, Long id) {
 		Cozinha cozinhaAtual = buscarOuFalhar(id);
 		BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");

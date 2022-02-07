@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.assembler.EstadoDtoAssembler;
+import com.algaworks.algafood.api.disassembler.EstadoInputDtoDisassembler;
+import com.algaworks.algafood.api.model.EstadoDto;
+import com.algaworks.algafood.api.model.input.EstadoInputDto;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 import com.algaworks.algafood.domain.service.CadastroEstadoService;
@@ -30,27 +33,36 @@ public class EstadoController {
 	EstadoRepository estadoRepository;
 	@Autowired
 	CadastroEstadoService cadastroEstado;
+	@Autowired
+	private EstadoDtoAssembler estadoDtoAssembler;
+	@Autowired
+	private EstadoInputDtoDisassembler estadoInputDtoDisassembler;
 
 	
 	@GetMapping
-	public List<Estado> listar(){
-		return estadoRepository.findAll();
+	public List<EstadoDto> listar(){
+		return estadoDtoAssembler.estadosToListEstadoDto(estadoRepository.findAll());
 	}
 	
 	@GetMapping("/{estadoId}")
-	public Estado buscar(@PathVariable("estadoId") Long id){
-		return cadastroEstado.buscarOuFalhar(id);
+	public EstadoDto buscar(@PathVariable("estadoId") Long id){
+		return estadoDtoAssembler.estadoToEstadoDto(cadastroEstado.buscarOuFalhar(id));
 	}
 	
 	@PostMapping
-	public ResponseEntity<Estado> criar(@RequestBody @Valid Estado estado){
-		estado = cadastroEstado.salvar(estado);
-		return ResponseEntity.status(HttpStatus.CREATED).body(estado);
+	@ResponseStatus(HttpStatus.CREATED)
+	public EstadoDto criar(@RequestBody @Valid EstadoInputDto estadoInputDto){
+		Estado estado = cadastroEstado.salvar(estadoInputDtoDisassembler.estadoInputDtoToEstado(estadoInputDto));
+		return estadoDtoAssembler.estadoToEstadoDto(estado);
 	}
 	
 	@PutMapping("/{estadoId}")
-	public Estado editar(@PathVariable("estadoId") Long id, @RequestBody @Valid Estado estado){
-		return estado = cadastroEstado.editar(estado, id);
+	public EstadoDto editar(@PathVariable("estadoId") Long id, @RequestBody @Valid EstadoInputDto estadoInputDto){
+		Estado estadoAtual = cadastroEstado.buscarOuFalhar(id);
+		
+		estadoInputDtoDisassembler.copyToDomainObject(estadoInputDto, estadoAtual);
+		
+		return estadoDtoAssembler.estadoToEstadoDto(estadoAtual);
 	}
 	
 	@DeleteMapping("/{estadoId}")

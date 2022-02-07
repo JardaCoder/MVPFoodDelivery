@@ -10,6 +10,14 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 import lombok.NonNull;
 
+
+/**
+ * Classe de exemplo para retorno em XML.
+ * 
+ * @author Jardel
+ * @since 2022-02-04
+ *
+ */
 @Data
 @JacksonXmlRootElement(localName = "cozinhas")
 public class CozinhasRepresentation {
