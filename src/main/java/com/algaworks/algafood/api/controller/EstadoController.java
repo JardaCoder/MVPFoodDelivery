@@ -62,6 +62,8 @@ public class EstadoController {
 		
 		estadoInputDtoDisassembler.copyToDomainObject(estadoInputDto, estadoAtual);
 		
+		estadoAtual = cadastroEstado.salvar(estadoAtual);
+		
 		return estadoDtoAssembler.estadoToEstadoDto(estadoAtual);
 	}
 	

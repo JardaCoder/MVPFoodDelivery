@@ -72,6 +72,8 @@ public class CozinhaController {
 		
 		cozinhaInputDtoDisassembler.copyToDomainObject(cozinhaInputDto, cozinhaAtual);
 		
+		cozinhaAtual = cadastroCozinha.salvar(cozinhaAtual);
+		
 		return cozinhaDtoAssembler.cozinhaToCozinhaDto(cozinhaAtual);
 		
 	}

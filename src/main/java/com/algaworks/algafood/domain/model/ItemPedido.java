@@ -46,4 +46,21 @@ public class ItemPedido {
 	@JoinColumn
 	private Produto produto;
 	
+	
+	public void calcularValorTotal() {
+		BigDecimal valorUnitario = this.precoUnitario;
+		Integer quantidade = this.quantidade;
+		
+		if(quantidade == null) {
+			quantidade = 0;
+		}
+		
+		if(valorUnitario == null) {
+			valorUnitario = BigDecimal.ZERO;
+		}
+		
+		this.setPrecoTotal(valorUnitario.multiply(new BigDecimal(quantidade)));
+		
+	}
+	
 }

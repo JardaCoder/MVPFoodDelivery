@@ -4,23 +4,28 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.algaworks.algafood.domain.enums.StatusPedido;
+import com.algaworks.algafood.domain.exception.NegocioException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -39,10 +44,13 @@ public class Pedido {
 	private Long id;
 	
 	@Column
+	private String codigo;
+	
+	@Column
 	private BigDecimal subtotal;
 	
 	@Column
-	private BigDecimal taxaFrete;
+	private BigDecimal taxaFrete = BigDecimal.ZERO;
 	
 	@Column
 	private BigDecimal valorTotal;
@@ -62,11 +70,11 @@ public class Pedido {
 
 	@Enumerated(EnumType.STRING)
 	@Column
-	private StatusPedido statusPedido;
+	private StatusPedido status = StatusPedido.CRIADO;
 	
 	@JsonIgnore
 	@Embedded
-	private Endereco endereco;
+	private Endereco enderecoEntrega;
 	
 	@JsonIgnore
 	@ManyToOne 
@@ -79,11 +87,54 @@ public class Pedido {
 	private Restaurante restaurante;
 	
 	@JsonIgnore
-	@ManyToOne 
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "forma_pagamento_id", nullable = false)
 	private FormaPagamento formaPagamento;
 	
-	@OneToMany(mappedBy = "pedido")
+	@OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
 	private List<ItemPedido> itens = new ArrayList<ItemPedido>();
+	
+	
+	public void calcularValorTotal() {
+		this.itens.forEach(ItemPedido::calcularValorTotal);
+		
+		BigDecimal subTotal = getItens().stream()
+		        .map(item -> item.getPrecoTotal())
+		        .reduce(BigDecimal.ZERO, BigDecimal::add);
+		
+		this.setSubtotal(subTotal);
+		
+		this.setValorTotal(subTotal.add(getTaxaFrete()));
+	}
+	
+	public void confirmar() {
+		setStatus(StatusPedido.CONFIRMADO);
+		setDataConfirmacao(OffsetDateTime.now());
+	}
+	
+	public void cancelar() {
+		setStatus(StatusPedido.CANCELADO);
+		setDataCancelamento(OffsetDateTime.now());
+	}
+	
+	public void confirmarEntrega() {
+		setStatus(StatusPedido.ENTREGE);
+		setDataEntrega(OffsetDateTime.now());
+	}
+	
+	private void setStatus(StatusPedido novoStatus) {
+		if(getStatus().naoPodeAlterarPara(novoStatus)) {
+			throw new NegocioException(String
+					.format("Status do pedido %s não pode ser alterado de %s para %s",
+							getCodigo(), getStatus().getDescricao(), novoStatus.getDescricao()));
+		}
+		
+		this.status = novoStatus;
+	}
+	
+	@PrePersist
+	private void gerarCodigo() {
+		setCodigo(UUID.randomUUID().toString());
+	}
 	
 }

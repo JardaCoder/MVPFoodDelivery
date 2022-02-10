@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 import com.algaworks.algafood.api.model.input.CidadeInputDto;
 import com.algaworks.algafood.domain.model.Cidade;
+import com.algaworks.algafood.domain.model.Cozinha;
+import com.algaworks.algafood.domain.model.Estado;
 
 @Component
 public class CidadeInputDtoDisassembler {
@@ -19,6 +21,9 @@ public class CidadeInputDtoDisassembler {
 	}
 	
 	public void copyToDomainObject(CidadeInputDto cidadeInput, Cidade cidade) {
+		
+		//Contornar erro do JPA que acha que estamos modificando o ID do estado.
+		cidade.setEstado(new Estado());
 		modelMapper.map(cidadeInput, cidade);
 	}
 }

@@ -67,11 +67,17 @@ public class CidadeController {
 	@PutMapping("/{cidadeId}")
 	public CidadeDto editar(@PathVariable("cidadeId") Long id, @RequestBody @Valid CidadeInputDto cidadeInputDto) {
 		
-		Cidade cidadeAtual = cadastroCidade.buscarOuFalhar(id);
-		
-		cidadeInputDtoDisassembler.copyToDomainObject(cidadeInputDto, cidadeAtual);
-		
-		return cidadeDtoAssembler.cidadeToCidadeDto(cidadeAtual);
+		try {			
+			Cidade cidadeAtual = cadastroCidade.buscarOuFalhar(id);
+			
+			cidadeInputDtoDisassembler.copyToDomainObject(cidadeInputDto, cidadeAtual);
+			
+			cidadeAtual = cadastroCidade.salvar(cidadeAtual);
+			
+			return cidadeDtoAssembler.cidadeToCidadeDto(cidadeAtual);
+		} catch (EstadoNaoEncontradoException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
 	}
 
 	@DeleteMapping("/{cidadeId}")
