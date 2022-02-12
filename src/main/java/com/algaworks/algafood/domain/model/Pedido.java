@@ -118,7 +118,7 @@ public class Pedido {
 	}
 	
 	public void confirmarEntrega() {
-		setStatus(StatusPedido.ENTREGE);
+		setStatus(StatusPedido.ENTREGUE);
 		setDataEntrega(OffsetDateTime.now());
 	}
 	

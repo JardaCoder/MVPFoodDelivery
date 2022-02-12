@@ -33,4 +33,6 @@ JpaSpecificationExecutor<Restaurante> {
 	@Query("FROM Restaurante r LEFT JOIN FETCH r.cozinha")
 	List<Restaurante> findAll();
 	
+	
+	
 }
