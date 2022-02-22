@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.api.assembler.CidadeDtoAssembler;
+import com.algaworks.algafood.api.controller.openapi.controller.CidadeControllerOpenApi;
 import com.algaworks.algafood.api.disassembler.CidadeInputDtoDisassembler;
 import com.algaworks.algafood.api.model.CidadeDto;
 import com.algaworks.algafood.api.model.input.CidadeInputDto;
@@ -26,9 +28,11 @@ import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.repository.CidadeRepository;
 import com.algaworks.algafood.domain.service.CadastroCidadeService;
 
+
+
 @RestController
-@RequestMapping(value = "/cidades")
-public class CidadeController {
+@RequestMapping(value = "/cidades", produces = MediaType.APPLICATION_JSON_VALUE)
+public class CidadeController implements CidadeControllerOpenApi {
 
 	@Autowired
 	CidadeRepository cidadeRepository;
@@ -39,6 +43,7 @@ public class CidadeController {
 	@Autowired
 	CidadeDtoAssembler cidadeDtoAssembler;
 
+	
 	@GetMapping
 	public List<CidadeDto> listar() {
 		return cidadeDtoAssembler.cidadesToListCidadeDto(cidadeRepository.findAll());
@@ -46,13 +51,13 @@ public class CidadeController {
 
 	@GetMapping("/{cidadeId}")
 	public CidadeDto buscar(@PathVariable("cidadeId") Long id) {
+		
 		return cidadeDtoAssembler.cidadeToCidadeDto(cadastroCidade.buscarOuFalhar(id));
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public CidadeDto criar(@RequestBody @Valid  CidadeInputDto cidadeInputDtp ) {
-		
 		try {
 				
 			Cidade cidade = cidadeInputDtoDisassembler.cidadeInputDtoToCidade(cidadeInputDtp);
@@ -83,7 +88,7 @@ public class CidadeController {
 	@DeleteMapping("/{cidadeId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable("cidadeId") Long id) {
+		
 		cadastroCidade.excluir(id);
-
 	}
 }

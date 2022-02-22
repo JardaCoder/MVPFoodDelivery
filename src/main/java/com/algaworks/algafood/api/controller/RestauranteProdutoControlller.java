@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.api.assembler.ProdutoDtoAssembler;
+import com.algaworks.algafood.api.controller.openapi.controller.RestauranteProdutoControllerOpenApi;
 import com.algaworks.algafood.api.disassembler.ProdutoInputDtoDisassembler;
 import com.algaworks.algafood.api.model.ProdutoDto;
 import com.algaworks.algafood.api.model.input.ProdutoInputDto;
@@ -25,8 +27,8 @@ import com.algaworks.algafood.domain.service.CadastroProdutoService;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 
 @RestController
-@RequestMapping(value = "/restaurantes/{restauranteId}/produtos")
-public class RestauranteProdutoControlller {
+@RequestMapping(value = "/restaurantes/{restauranteId}/produtos", produces = MediaType.APPLICATION_JSON_VALUE)
+public class RestauranteProdutoControlller implements RestauranteProdutoControllerOpenApi {
 
 	@Autowired
 	private CadastroRestauranteService cadastroRestaurante;
@@ -39,6 +41,7 @@ public class RestauranteProdutoControlller {
 	@Autowired 
 	private ProdutoRepository produtoRepository;
 	
+	@Override
 	@GetMapping
 	public List<ProdutoDto> listar(@PathVariable Long restauranteId, @RequestParam(required = false) boolean incluirInativos){
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
@@ -55,6 +58,7 @@ public class RestauranteProdutoControlller {
 		return produtoDtoAssembler.produtosToListProdutoDto(produtos);
 	}
 	
+	@Override
 	@GetMapping("/{produtoId}")
 	public ProdutoDto buscar(@PathVariable Long restauranteId, @PathVariable Long produtoId){
 		Produto produto = cadastroProduto.buscarOuFalhar(produtoId, restauranteId);
@@ -62,6 +66,7 @@ public class RestauranteProdutoControlller {
 		return produtoDtoAssembler.produtoToProdutoDto(produto);
 	}
 	
+	@Override
 	@PostMapping
 	public ProdutoDto criar(@PathVariable Long restauranteId, @RequestBody @Valid ProdutoInputDto produtoInput){
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
@@ -73,6 +78,7 @@ public class RestauranteProdutoControlller {
 	}
 	
 	
+	@Override
 	@PutMapping("/{produtoId}")
 	public ProdutoDto editar(@PathVariable Long produtoId, @PathVariable Long restauranteId, @RequestBody @Valid ProdutoInputDto produtoInput){
 			Produto produtoAtual = cadastroProduto.buscarOuFalhar(produtoId, restauranteId);

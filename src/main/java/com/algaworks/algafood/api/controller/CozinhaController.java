@@ -23,17 +23,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.api.assembler.CozinhaDtoAssembler;
+import com.algaworks.algafood.api.controller.openapi.controller.CozinhaControllerOpenApi;
 import com.algaworks.algafood.api.disassembler.CozinhaInputDtoDisassembler;
 import com.algaworks.algafood.api.model.CozinhaDto;
-import com.algaworks.algafood.api.model.CozinhasRepresentation;
 import com.algaworks.algafood.api.model.input.CozinhaInputDto;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.service.CadastroCozinhaService;
 
 @RestController
-@RequestMapping(value = "/cozinhas")
-public class CozinhaController {
+@RequestMapping(value = "/cozinhas", produces = MediaType.APPLICATION_JSON_VALUE)
+public class CozinhaController implements CozinhaControllerOpenApi {
 	
 	@Autowired
 	private CozinhaRepository cozinhaRepository;
@@ -57,11 +57,6 @@ public class CozinhaController {
 		return  cozinhasDtoPage;
 	}
 	
-	@Deprecated
-	@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
-	public CozinhasRepresentation listarXml(){
-		return new CozinhasRepresentation(cozinhaRepository.findAll());
-	}
 	
 	@GetMapping("/{cozinhaId}")
 	public CozinhaDto buscar(@PathVariable("cozinhaId") Long id){
@@ -95,3 +90,9 @@ public class CozinhaController {
 		cadastroCozinha.excluir(id);
 	}
 }
+
+//	@Deprecated
+//	@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
+//	public CozinhasRepresentation listarXml(){
+//		return new CozinhasRepresentation(cozinhaRepository.findAll());
+//	}

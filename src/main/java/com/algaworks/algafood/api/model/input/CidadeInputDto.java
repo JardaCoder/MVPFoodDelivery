@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +14,12 @@ import lombok.Setter;
 @Setter
 public class CidadeInputDto {
 
+	@ApiModelProperty(example = "Santa Catarina", required = true)
 	@NotBlank
 	private String nome;
 	
+	
+	@ApiModelProperty(required = true)
 	@JsonIgnoreProperties(value = "nome", allowGetters = true)
 	@NotNull
 	@Valid

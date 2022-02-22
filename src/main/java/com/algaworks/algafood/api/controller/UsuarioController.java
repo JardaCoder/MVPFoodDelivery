@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.api.assembler.UsuarioDtoAssembler;
+import com.algaworks.algafood.api.controller.openapi.controller.UsuarioControllerOpenApi;
 import com.algaworks.algafood.api.disassembler.UsuarioInputDtoDisassembler;
 import com.algaworks.algafood.api.model.UsuarioDto;
 import com.algaworks.algafood.api.model.input.AlterarSenhaInputDto;
@@ -27,8 +29,8 @@ import com.algaworks.algafood.domain.repository.UsuarioRepository;
 import com.algaworks.algafood.domain.service.CadastroUsuarioService;
 
 @RestController
-@RequestMapping(value = "/usuarios")
-public class UsuarioController {
+@RequestMapping(value = "/usuarios",  produces = MediaType.APPLICATION_JSON_VALUE)
+public class UsuarioController implements UsuarioControllerOpenApi {
 	
 	
 	@Autowired
@@ -41,16 +43,19 @@ public class UsuarioController {
 	private UsuarioInputDtoDisassembler usuarioInputDtoDisassembler;
 
 	
+	@Override
 	@GetMapping
 	public List<UsuarioDto> listar(){
 		return usuarioDtoAssembler.usuariosToListUsuarioDto(usuarioRepository.findAll());
 	}
 	
+	@Override
 	@GetMapping("/{usuarioId}")
 	public UsuarioDto buscar(@PathVariable("usuarioId") Long id){
 		return usuarioDtoAssembler.usuarioToUsuarioDto(cadastroUsuario.buscarOuFalhar(id));
 	}
 	
+	@Override
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public UsuarioDto criar(@RequestBody @Valid UsuarioInputComSenhaDto usuarioInputDto){
@@ -58,6 +63,7 @@ public class UsuarioController {
 		return usuarioDtoAssembler.usuarioToUsuarioDto(usuario);
 	}
 	
+	@Override
 	@PutMapping("/{usuarioId}")
 	public UsuarioDto editar(@PathVariable("usuarioId") Long id, @RequestBody @Valid UsuarioInputDto usuarioInputDto){
 		Usuario usuarioAtual = cadastroUsuario.buscarOuFalhar(id);
@@ -69,6 +75,7 @@ public class UsuarioController {
 		return usuarioDtoAssembler.usuarioToUsuarioDto(usuarioAtual);
 	}
 	
+	@Override
 	@PutMapping("/{usuarioId}/senha")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void alterarSenha(@PathVariable("usuarioId") Long id, @RequestBody @Valid AlterarSenhaInputDto alterarSenhaInput){
@@ -76,6 +83,7 @@ public class UsuarioController {
 	}
 	
 	
+	@Override
 	@DeleteMapping("/{usuarioId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable("usuarioId") Long id){

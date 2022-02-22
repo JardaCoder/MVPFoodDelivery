@@ -1,0 +1,33 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007fe17d0520ad, pid=44852, tid=44868
+#
+# JRE version: OpenJDK Runtime Environment (11.0.13+8) (build 11.0.13+8-Ubuntu-0ubuntu1.20.04)
+# Java VM: OpenJDK 64-Bit Server VM (11.0.13+8-Ubuntu-0ubuntu1.20.04, mixed mode, sharing, tiered, compressed oops, g1 gc, linux-amd64)
+# Problematic frame:
+# C  [libjimage.so+0x30ad]
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/usr/share/apport/apport %p %s %c %d %P %E" (or dumping to /home/usuario/Documentos/git/MVPFoodDelivery/core.44852)
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugs.launchpad.net/ubuntu/+source/openjdk-lts
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -agentlib:jdwp=transport=dt_socket,suspend=y,address=localhost:43131 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=33155 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost -Dspring.jmx.enabled=true -Dspring.application.admin.enabled=true -Djava.security.egd=file:/dev/./urandom -XX:TieredStopAtLevel=1 -Dspring.boot.project.name=algafood-api -javaagent:/home/usuario/eclipse/jee-2021-12/eclipse/configuration/org.eclipse.osgi/413/0/.cp/lib/javaagent-shaded.jar -Dfile.encoding=UTF-8 com.algaworks.algafood.JardaFoodApiApplication --spring.mail.password=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 --jardafood.storage.s3.chave-acesso-secreta=qvO37B1fWwf1cL0yFtF2r4ZnVrcI8nSnDO7EHUCE --jardafood.storage.s3.id-chave-acesso=AKIAVF255RFM76P7OQNZ
+
+Host: Intel(R) Core(TM) i5-9400F CPU @ 2.90GHz, 6 cores, 15G, Ubuntu 20.04.3 LTS
+Time: Wed Feb 16 15:41:51 2022 -03 elapsed time: 710.216082 seconds (0d 0h 11m 50s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007fe17823a000):  JavaThread "Signal Dispatcher" daemon [_thread_in_vm, id=44868, stack(0x00007fe1502f6000,0x00007fe1503f7000)]
+
+Stack: [0x00007fe1502f6000,0x00007fe1503f7000],  sp=0x00007fe1503f4200,  free space=1016k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [libjimage.so+0x30ad]
+C  [libjimage.so+0x3ca2]
+C  [libjimage.so+0x4191]  JIMAGE_FindResource+0xf1
+V  [libjvm.so+0x5b8c41]

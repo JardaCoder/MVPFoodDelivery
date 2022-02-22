@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.api.assembler.GrupoDtoAssembler;
+import com.algaworks.algafood.api.controller.openapi.controller.UsuarioGrupoControllerOpenApi;
 import com.algaworks.algafood.api.model.GrupoDto;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.PermissaoRepository;
@@ -21,7 +22,7 @@ import com.algaworks.algafood.domain.service.CadastroUsuarioService;
 
 @RestController
 @RequestMapping(value = "/usuarios/{usuarioId}/grupos")
-public class UsuarioGrupoController {
+public class UsuarioGrupoController implements UsuarioGrupoControllerOpenApi {
 	
 	
 	@Autowired
@@ -34,18 +35,21 @@ public class UsuarioGrupoController {
 	private GrupoDtoAssembler grupoDtoAssembler;
 
 	
+	@Override
 	@GetMapping
 	public List<GrupoDto> listar(@PathVariable Long usuarioId){
 		Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
 		return grupoDtoAssembler.gruposToListGrupoDto(usuario.getGrupos());
 	}
 	
+	@Override
 	@DeleteMapping("/{grupoId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void desassociar(@PathVariable Long usuarioId, @PathVariable Long grupoId){
 		cadastroUsuario.desassociarGrupo(usuarioId, grupoId);
 	}
 	
+	@Override
 	@PutMapping("/{grupoId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void associar(@PathVariable Long usuarioId, @PathVariable Long grupoId){

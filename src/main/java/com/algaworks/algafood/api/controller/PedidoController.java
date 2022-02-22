@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.api.assembler.PedidoDtoAssembler;
 import com.algaworks.algafood.api.assembler.PedidoResumoDtoAssembler;
+import com.algaworks.algafood.api.controller.openapi.controller.PedidoControllerOpenApi;
 import com.algaworks.algafood.api.disassembler.PedidoInputDtoDisassembler;
 import com.algaworks.algafood.api.model.PedidoDto;
 import com.algaworks.algafood.api.model.PedidoResumoDto;
@@ -36,8 +38,8 @@ import com.algaworks.algafood.domain.service.EmissaoPedidoService;
 import com.algaworks.algafood.infrastructure.repository.spec.PedidoSpecs;
 
 @RestController
-@RequestMapping(value = "/pedidos")
-public class PedidoController {
+@RequestMapping(value = "/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)
+public class PedidoController implements PedidoControllerOpenApi {
 	
 	
 	@Autowired
@@ -50,7 +52,7 @@ public class PedidoController {
 	private PedidoResumoDtoAssembler pedidoResumoDtoAssembler;
 	@Autowired
 	private PedidoInputDtoDisassembler pedidoInputDtoDisassembler;
-	
+
 	
 	@GetMapping
 	public Page<PedidoResumoDto> pesquisar(PedidoFilter pedidoFilter, @PageableDefault(size = 10)  Pageable pageable){
@@ -66,6 +68,7 @@ public class PedidoController {
 		return pedidosDtoPage;
 	}
 	
+
 	@GetMapping("/{codigoPedido}")
 	public PedidoDto buscar(@PathVariable("codigoPedido") String codigoPedido){
 		return pedidoDtoAssembler.pedidoToPedidoDto(cadastroPedido.buscarOuFalhar(codigoPedido));
