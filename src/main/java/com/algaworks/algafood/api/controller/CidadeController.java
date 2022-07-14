@@ -1,10 +1,9 @@
 package com.algaworks.algafood.api.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.ResourceUriHelper;
 import com.algaworks.algafood.api.assembler.CidadeDtoAssembler;
 import com.algaworks.algafood.api.controller.openapi.controller.CidadeControllerOpenApi;
 import com.algaworks.algafood.api.disassembler.CidadeInputDtoDisassembler;
@@ -45,14 +45,13 @@ public class CidadeController implements CidadeControllerOpenApi {
 
 	
 	@GetMapping
-	public List<CidadeDto> listar() {
-		return cidadeDtoAssembler.cidadesToListCidadeDto(cidadeRepository.findAll());
+	public CollectionModel<CidadeDto> listar() {
+		return cidadeDtoAssembler.toCollectionModel(cidadeRepository.findAll());
 	}
 
 	@GetMapping("/{cidadeId}")
 	public CidadeDto buscar(@PathVariable("cidadeId") Long id) {
-		
-		return cidadeDtoAssembler.cidadeToCidadeDto(cadastroCidade.buscarOuFalhar(id));
+		return  cidadeDtoAssembler.toModel(cadastroCidade.buscarOuFalhar(id));
 	}
 
 	@PostMapping
@@ -62,8 +61,11 @@ public class CidadeController implements CidadeControllerOpenApi {
 				
 			Cidade cidade = cidadeInputDtoDisassembler.cidadeInputDtoToCidade(cidadeInputDtp);
 			cadastroCidade.salvar(cidade);
-			return cidadeDtoAssembler.cidadeToCidadeDto(cidade);
+			CidadeDto cidadeDto = cidadeDtoAssembler.toModel(cidade);
 			
+			ResourceUriHelper.addUriResponseHeader(cidadeDto.getId());
+			
+			return cidadeDto;
 		} catch (EstadoNaoEncontradoException e) {
 			throw new NegocioException(e.getMessage());
 		}
@@ -79,7 +81,7 @@ public class CidadeController implements CidadeControllerOpenApi {
 			
 			cidadeAtual = cadastroCidade.salvar(cidadeAtual);
 			
-			return cidadeDtoAssembler.cidadeToCidadeDto(cidadeAtual);
+			return cidadeDtoAssembler.toModel(cidadeAtual);
 		} catch (EstadoNaoEncontradoException e) {
 			throw new NegocioException(e.getMessage(), e);
 		}

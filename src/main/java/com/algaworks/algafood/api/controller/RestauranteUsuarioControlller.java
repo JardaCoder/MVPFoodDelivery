@@ -1,8 +1,10 @@
 package com.algaworks.algafood.api.controller;
 
-import java.util.List;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,32 +28,28 @@ public class RestauranteUsuarioControlller implements RestauranteUsuarioControll
 	private CadastroRestauranteService cadastroRestaurante;
 	@Autowired
 	private UsuarioDtoAssembler usuarioDtoAssembler;
-	
+
 	@Override
 	@GetMapping
-	public List<UsuarioDto> listar(@PathVariable Long restauranteId){
+	public CollectionModel<UsuarioDto> listar(@PathVariable Long restauranteId) {
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
-		
-		return usuarioDtoAssembler
-				.usuariosToListUsuarioDto(restaurante.getResponsaveis());
+
+		return usuarioDtoAssembler.toCollectionModel(restaurante.getResponsaveis()).removeLinks()
+				.add(linkTo(methodOn(RestauranteUsuarioControlller.class).listar(restauranteId)).withSelfRel());
 	}
-	
-	
+
 	@Override
 	@DeleteMapping("/{usuarioId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void desassociar(@PathVariable Long restauranteId, @PathVariable Long usuarioId){
+	public void desassociar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {
 		cadastroRestaurante.desassociarUsuario(restauranteId, usuarioId);
 	}
-	
+
 	@Override
 	@PutMapping("/{usuarioId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void associar(@PathVariable Long restauranteId, @PathVariable Long usuarioId){
+	public void associar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {
 		cadastroRestaurante.associarUsuario(restauranteId, usuarioId);
 	}
-	
+
 }
-
-
-

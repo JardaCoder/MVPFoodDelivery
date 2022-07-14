@@ -1,10 +1,9 @@
 package com.algaworks.algafood.api.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,14 +41,14 @@ public class EstadoController implements EstadoControllerOpenApi {
 	
 	@Override
 	@GetMapping
-	public List<EstadoDto> listar(){
-		return estadoDtoAssembler.estadosToListEstadoDto(estadoRepository.findAll());
+	public CollectionModel<EstadoDto> listar(){
+		return estadoDtoAssembler.toCollectionModel(estadoRepository.findAll());
 	}
 	
 	@Override
 	@GetMapping("/{estadoId}")
 	public EstadoDto buscar(@PathVariable("estadoId") Long id){
-		return estadoDtoAssembler.estadoToEstadoDto(cadastroEstado.buscarOuFalhar(id));
+		return estadoDtoAssembler.toModel(cadastroEstado.buscarOuFalhar(id));
 	}
 	
 	@Override
@@ -57,7 +56,7 @@ public class EstadoController implements EstadoControllerOpenApi {
 	@ResponseStatus(HttpStatus.CREATED)
 	public EstadoDto criar(@RequestBody @Valid EstadoInputDto estadoInputDto){
 		Estado estado = cadastroEstado.salvar(estadoInputDtoDisassembler.estadoInputDtoToEstado(estadoInputDto));
-		return estadoDtoAssembler.estadoToEstadoDto(estado);
+		return estadoDtoAssembler.toModel(estado);
 	}
 	
 	@Override
@@ -69,7 +68,7 @@ public class EstadoController implements EstadoControllerOpenApi {
 		
 		estadoAtual = cadastroEstado.salvar(estadoAtual);
 		
-		return estadoDtoAssembler.estadoToEstadoDto(estadoAtual);
+		return estadoDtoAssembler.toModel(estadoAtual);
 	}
 	
 	@Override

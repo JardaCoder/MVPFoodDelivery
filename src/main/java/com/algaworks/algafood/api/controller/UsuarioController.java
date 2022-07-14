@@ -1,10 +1,9 @@
 package com.algaworks.algafood.api.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,14 +44,14 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 	
 	@Override
 	@GetMapping
-	public List<UsuarioDto> listar(){
-		return usuarioDtoAssembler.usuariosToListUsuarioDto(usuarioRepository.findAll());
+	public CollectionModel<UsuarioDto> listar(){
+		return usuarioDtoAssembler.toCollectionModel(usuarioRepository.findAll());
 	}
 	
 	@Override
 	@GetMapping("/{usuarioId}")
 	public UsuarioDto buscar(@PathVariable("usuarioId") Long id){
-		return usuarioDtoAssembler.usuarioToUsuarioDto(cadastroUsuario.buscarOuFalhar(id));
+		return usuarioDtoAssembler.toModel(cadastroUsuario.buscarOuFalhar(id));
 	}
 	
 	@Override
@@ -60,7 +59,7 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 	@ResponseStatus(HttpStatus.CREATED)
 	public UsuarioDto criar(@RequestBody @Valid UsuarioInputComSenhaDto usuarioInputDto){
 		Usuario usuario = cadastroUsuario.salvar(usuarioInputDtoDisassembler.usuarioInputDtoToUsuario(usuarioInputDto));
-		return usuarioDtoAssembler.usuarioToUsuarioDto(usuario);
+		return usuarioDtoAssembler.toModel(usuario);
 	}
 	
 	@Override
@@ -72,7 +71,7 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 		
 		usuarioAtual = cadastroUsuario.salvar(usuarioAtual);
 		
-		return usuarioDtoAssembler.usuarioToUsuarioDto(usuarioAtual);
+		return usuarioDtoAssembler.toModel(usuarioAtual);
 	}
 	
 	@Override
