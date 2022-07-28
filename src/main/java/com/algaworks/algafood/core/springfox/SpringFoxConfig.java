@@ -14,18 +14,39 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Links;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.algaworks.algafood.api.controller.openapi.model.CidadesDtoOpenApi;
 import com.algaworks.algafood.api.controller.openapi.model.CozinhasDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.EstadosDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.FormasPagamentoDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.GruposDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.LinksDtoOpenApi;
 import com.algaworks.algafood.api.controller.openapi.model.PageableDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.PedidoResumoDtoOpenApi;
 import com.algaworks.algafood.api.controller.openapi.model.PedidosResumoDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.PermissoesDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.ProdutosDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.RestaurantesBasicoDtoOpenApi;
+import com.algaworks.algafood.api.controller.openapi.model.UsuariosDtoOpenApi;
 import com.algaworks.algafood.api.exceptionhandler.Problem;
+import com.algaworks.algafood.api.model.CidadeDto;
 import com.algaworks.algafood.api.model.CozinhaDto;
+import com.algaworks.algafood.api.model.EstadoDto;
+import com.algaworks.algafood.api.model.FormaPagamentoDto;
+import com.algaworks.algafood.api.model.GrupoDto;
 import com.algaworks.algafood.api.model.PedidoResumoDto;
+import com.algaworks.algafood.api.model.PermissaoDto;
+import com.algaworks.algafood.api.model.ProdutoDto;
+import com.algaworks.algafood.api.model.RestauranteBasicoDto;
+import com.algaworks.algafood.api.model.UsuarioDto;
 import com.fasterxml.classmate.TypeResolver;
 
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
@@ -71,15 +92,61 @@ public class SpringFoxConfig implements WebMvcConfigurer{
 //					))
 			.additionalModels(typeResolver.resolve(Problem.class))
 			.directModelSubstitute(Pageable.class, PageableDtoOpenApi.class)
+			.directModelSubstitute(Links.class, LinksDtoOpenApi.class)
 			.alternateTypeRules(AlternateTypeRules.newRule(
-					typeResolver.resolve(Page.class, CozinhaDto.class),
+					typeResolver.resolve(PagedModel.class, CozinhaDto.class),
 					CozinhasDtoOpenApi.class
+				)
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+					typeResolver.resolve(CollectionModel.class, CidadeDto.class),
+					CidadesDtoOpenApi.class
 				)
 			)
 			.alternateTypeRules(AlternateTypeRules.newRule(
 					typeResolver.resolve(Page.class, PedidoResumoDto.class),
 					PedidosResumoDtoOpenApi.class
 				)
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, EstadoDto.class),
+			        EstadosDtoOpenApi.class
+			    )
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, FormaPagamentoDto.class),
+			        FormasPagamentoDtoOpenApi.class
+			    )
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, GrupoDto.class),
+			        GruposDtoOpenApi.class
+			    )
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, PermissaoDto.class),
+			        PermissoesDtoOpenApi.class
+			    )
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, PedidoResumoDto.class),
+			        PedidoResumoDtoOpenApi.class
+			    )
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, ProdutoDto.class),
+			        ProdutosDtoOpenApi.class
+			    )
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, RestauranteBasicoDto.class),
+			        RestaurantesBasicoDtoOpenApi.class
+			    )
+			)
+			.alternateTypeRules(AlternateTypeRules.newRule(
+			        typeResolver.resolve(CollectionModel.class, UsuarioDto.class),
+			        UsuariosDtoOpenApi.class
+			    )
 			)
 			.ignoredParameterTypes(ServletWebRequest.class, URL.class, URI.class, URLStreamHandler.class, 
 					Resource.class, File.class, InputStream.class)
@@ -173,7 +240,8 @@ public class SpringFoxConfig implements WebMvcConfigurer{
     			new Tag("Estados", "Gerencia os estados"),
     		    new Tag("Produtos", "Gerencia os produtos de restaurantes"),
     		    new Tag("Usuários", "Gerencia os usuários"),
-    		    new Tag("Estatísticas", "Estatísticas do JardaFood")
+    		    new Tag("Estatísticas", "Estatísticas do JardaFood"),
+    		    new Tag("Permissões", "Gerencia as permissões")
     		);
     }
     

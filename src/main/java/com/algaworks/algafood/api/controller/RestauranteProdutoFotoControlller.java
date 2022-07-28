@@ -67,16 +67,16 @@ public class RestauranteProdutoFotoControlller implements RestauranteProdutoFoto
 		
 		FotoProduto fotoSalva = catalogoFotoProdutoService.salvar(foto, arquivo.getInputStream());
 		
-		return fotoProdutoDtoAssembler.fotoProdutoToFotoProdutoDto(fotoSalva);
+		return fotoProdutoDtoAssembler.toModel(fotoSalva);
 	}
 	
 	@Override
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public FotoProdutoDto buscarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId) throws IOException {
+	public FotoProdutoDto buscarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoId) {
 		
 		var foto = catalogoFotoProdutoService.buscarOuFalhar(produtoId, restauranteId);
 		
-		return fotoProdutoDtoAssembler.fotoProdutoToFotoProdutoDto(foto);
+		return fotoProdutoDtoAssembler.toModel(foto);
 	}
 	
 	@Override

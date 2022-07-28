@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.JardaLinks;
 import com.algaworks.algafood.api.assembler.ProdutoDtoAssembler;
 import com.algaworks.algafood.api.controller.openapi.controller.RestauranteProdutoControllerOpenApi;
 import com.algaworks.algafood.api.disassembler.ProdutoInputDtoDisassembler;
@@ -40,10 +42,12 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 	private ProdutoInputDtoDisassembler produtoInputDtoDisassembler;
 	@Autowired 
 	private ProdutoRepository produtoRepository;
+	@Autowired
+	private JardaLinks jardaLinks;
 	
 	@Override
 	@GetMapping
-	public List<ProdutoDto> listar(@PathVariable Long restauranteId, @RequestParam(required = false) boolean incluirInativos){
+	public CollectionModel<ProdutoDto> listar(@PathVariable Long restauranteId, @RequestParam(required = false) Boolean incluirInativos){
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
 		
 		List<Produto> produtos = null;
@@ -54,8 +58,8 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 			produtos = produtoRepository.findAtivosByRestaurante(restaurante);
 		}
 		
-		
-		return produtoDtoAssembler.produtosToListProdutoDto(produtos);
+		return produtoDtoAssembler.toCollectionModel(produtos)
+				.add(jardaLinks.linkToProdutos(restauranteId));
 	}
 	
 	@Override
@@ -63,7 +67,7 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 	public ProdutoDto buscar(@PathVariable Long restauranteId, @PathVariable Long produtoId){
 		Produto produto = cadastroProduto.buscarOuFalhar(produtoId, restauranteId);
 		
-		return produtoDtoAssembler.produtoToProdutoDto(produto);
+		return produtoDtoAssembler.toModel(produto);
 	}
 	
 	@Override
@@ -74,7 +78,7 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 		Produto produto = produtoInputDtoDisassembler.produtoInputDtoToProduto(produtoInput);
 		produto.setRestaurante(restaurante);
 		
-		return produtoDtoAssembler.produtoToProdutoDto(cadastroProduto.salvar(produto));
+		return produtoDtoAssembler.toModel(cadastroProduto.salvar(produto));
 	}
 	
 	
@@ -87,7 +91,7 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 			
 			produtoAtual = cadastroProduto.salvar(produtoAtual);
 			
-			return produtoDtoAssembler.produtoToProdutoDto(produtoAtual);
+			return produtoDtoAssembler.toModel(produtoAtual);
 	}
 	
 	

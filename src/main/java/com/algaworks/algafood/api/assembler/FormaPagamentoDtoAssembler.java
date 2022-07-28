@@ -1,28 +1,45 @@
 package com.algaworks.algafood.api.assembler;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 
+import com.algaworks.algafood.api.JardaLinks;
+import com.algaworks.algafood.api.controller.FormaPagamentoController;
 import com.algaworks.algafood.api.model.FormaPagamentoDto;
 import com.algaworks.algafood.domain.model.FormaPagamento;
 
 @Component
-public class FormaPagamentoDtoAssembler {
+public class FormaPagamentoDtoAssembler extends RepresentationModelAssemblerSupport<FormaPagamento, FormaPagamentoDto> {
 	
+	 public FormaPagamentoDtoAssembler() {
+		 super(FormaPagamentoController.class, FormaPagamentoDto.class);
+	 }
+
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public FormaPagamentoDto formaPagamentoToFormaPagamentoDto(FormaPagamento formaPagamento) {
-		return modelMapper.map(formaPagamento, FormaPagamentoDto.class);
+	@Autowired
+	private JardaLinks jardaLinks;
+	
+	public FormaPagamentoDto toModel(FormaPagamento formaPagamento) {
+		
+		FormaPagamentoDto formaPagamentoDto = 
+				createModelWithId(formaPagamento.getId(), formaPagamento);
+		 
+		modelMapper.map(formaPagamento, formaPagamentoDto);
+		 
+		formaPagamentoDto.add(jardaLinks.linkToFormasPagamento("formasPagamento")); 
+		
+		return formaPagamentoDto;
 	}
 	
-	public List<FormaPagamentoDto>	formasPagamentoToListFormaPagamentoDto(Collection<FormaPagamento> formasPagamento) {
-		return formasPagamento.stream().map(this::formaPagamentoToFormaPagamentoDto).collect(Collectors.toList());
+	@Override
+	public CollectionModel<FormaPagamentoDto> toCollectionModel(Iterable<? extends FormaPagamento> entities) {
+		return super.toCollectionModel(entities)
+				.add(jardaLinks.linkToFormasPagamento());
 	}
 	
 

@@ -8,10 +8,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.StrategyFactory;
+import com.algaworks.algafood.domain.enums.Notificador;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
@@ -26,6 +29,10 @@ public class TesteController {
 	
 	@Autowired
 	private RestauranteRepository restauranteRepository;
+	
+	@Autowired
+	private StrategyFactory strategyFactory;
+	
 	
 	@GetMapping("cozinhas/por-nome")
 	public ResponseEntity<List<Cozinha>> listar(@RequestParam("nome") String nome){
@@ -82,6 +89,12 @@ public class TesteController {
 	@GetMapping("cozinhas/primeira")
 	public Optional<Cozinha> buscarPrimeiraCozinha(String nome){
 		return cozinhaRepository.buscarPrimeiro();
+	}
+	
+
+	@GetMapping("/strategy/{notificador}")
+	public String buscarPrimeiraCozinha(@PathVariable Notificador notificador){
+		return strategyFactory.findStrategy(notificador).printStrategy();
 	}
 
 }

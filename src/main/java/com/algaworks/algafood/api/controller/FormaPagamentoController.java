@@ -1,11 +1,11 @@
 package com.algaworks.algafood.api.controller;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +47,7 @@ public class FormaPagamentoController implements FormaPagamentoControllerOpenApi
 	
 	@Override
 	@GetMapping
-	public ResponseEntity<List<FormaPagamentoDto>> listar(ServletWebRequest request){
+	public ResponseEntity<CollectionModel<FormaPagamentoDto>> listar(ServletWebRequest request){
 		
 		ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
 		
@@ -63,7 +63,7 @@ public class FormaPagamentoController implements FormaPagamentoControllerOpenApi
 			return null;
 		}
 		
-		var formasPagamentoDto = formaPagamentoDtoAssembler.formasPagamentoToListFormaPagamentoDto(formaPagamentoRepository.findAll());
+		var formasPagamentoDto = formaPagamentoDtoAssembler.toCollectionModel(formaPagamentoRepository.findAll());
 		return ResponseEntity.ok()
 				.cacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES))
 				//exemplos
@@ -94,7 +94,7 @@ public class FormaPagamentoController implements FormaPagamentoControllerOpenApi
 		}
 		
 		 var formaPagamento = formaPagamentoDtoAssembler
-				 .formaPagamentoToFormaPagamentoDto(cadastroFormaPagamento.buscarOuFalhar(id));
+				 .toModel(cadastroFormaPagamento.buscarOuFalhar(id));
 		 
 		return ResponseEntity.ok()
 				.cacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES))
@@ -107,7 +107,7 @@ public class FormaPagamentoController implements FormaPagamentoControllerOpenApi
 	@ResponseStatus(HttpStatus.CREATED)
 	public FormaPagamentoDto criar(@RequestBody @Valid FormaPagamentoInputDto formaPagamentoInputDto){
 		FormaPagamento formaPagamento = cadastroFormaPagamento.salvar(formaPagamentoInputDtoDisassembler.formaPagamentoInputDtoToFormaPagamento(formaPagamentoInputDto));
-		return formaPagamentoDtoAssembler.formaPagamentoToFormaPagamentoDto(formaPagamento);
+		return formaPagamentoDtoAssembler.toModel(formaPagamento);
 	}
 	
 	@Override
@@ -119,7 +119,7 @@ public class FormaPagamentoController implements FormaPagamentoControllerOpenApi
 		
 		formaPagamentoAtual  = cadastroFormaPagamento.salvar(formaPagamentoAtual);
 		
-		return formaPagamentoDtoAssembler.formaPagamentoToFormaPagamentoDto(formaPagamentoAtual);
+		return formaPagamentoDtoAssembler.toModel(formaPagamentoAtual);
 	}
 	
 	@Override

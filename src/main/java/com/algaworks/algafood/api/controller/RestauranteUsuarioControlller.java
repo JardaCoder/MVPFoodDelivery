@@ -1,19 +1,16 @@
 package com.algaworks.algafood.api.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.JardaLinks;
 import com.algaworks.algafood.api.assembler.UsuarioDtoAssembler;
 import com.algaworks.algafood.api.controller.openapi.controller.RestauranteUsuarioControllerOpenApi;
 import com.algaworks.algafood.api.model.UsuarioDto;
@@ -28,28 +25,44 @@ public class RestauranteUsuarioControlller implements RestauranteUsuarioControll
 	private CadastroRestauranteService cadastroRestaurante;
 	@Autowired
 	private UsuarioDtoAssembler usuarioDtoAssembler;
+	@Autowired
+	private JardaLinks jardaLinks;
 
 	@Override
 	@GetMapping
 	public CollectionModel<UsuarioDto> listar(@PathVariable Long restauranteId) {
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
-
-		return usuarioDtoAssembler.toCollectionModel(restaurante.getResponsaveis()).removeLinks()
-				.add(linkTo(methodOn(RestauranteUsuarioControlller.class).listar(restauranteId)).withSelfRel());
+		
+		
+		CollectionModel<UsuarioDto> usuarios =  usuarioDtoAssembler
+				.toCollectionModel(restaurante.getResponsaveis())
+				.removeLinks()
+				.add(jardaLinks.linkToResponsaveisRestaurante(restauranteId))
+				.add(jardaLinks.linkToRestauranteResponsavelAssociacao(restauranteId, "associar"));
+		
+		usuarios.getContent().forEach(usuario ->{
+			usuario.add(jardaLinks
+					.linkToRestauranteResponsavelDesassociacao(
+							restauranteId, usuario.getId(), "desassociar"));
+		});
+		
+		return usuarios;
 	}
 
 	@Override
 	@DeleteMapping("/{usuarioId}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void desassociar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {
+	public ResponseEntity<Void> desassociar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {
 		cadastroRestaurante.desassociarUsuario(restauranteId, usuarioId);
+		
+		return ResponseEntity.noContent().build();
 	}
 
 	@Override
 	@PutMapping("/{usuarioId}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void associar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {
+	public ResponseEntity<Void> associar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {
 		cadastroRestaurante.associarUsuario(restauranteId, usuarioId);
+		
+		return ResponseEntity.noContent().build();
 	}
 
 }
