@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import com.algaworks.algafood.api.model.RestauranteDto;
-import com.algaworks.algafood.api.model.input.RestauranteInputDto;
+import com.algaworks.algafood.api.v1.model.RestauranteDto;
+import com.algaworks.algafood.api.v1.model.input.RestauranteInputDto;
 
 import lombok.AllArgsConstructor;
 

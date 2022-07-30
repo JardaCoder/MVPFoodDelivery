@@ -8,10 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
-import com.algaworks.algafood.api.model.input.CidadeIdInputDto;
-import com.algaworks.algafood.api.model.input.CozinhaIdInputDto;
-import com.algaworks.algafood.api.model.input.EnderecoInputDto;
-import com.algaworks.algafood.api.model.input.RestauranteInputDto;
+import com.algaworks.algafood.api.v1.model.input.CidadeIdInputDto;
+import com.algaworks.algafood.api.v1.model.input.CozinhaIdInputDto;
+import com.algaworks.algafood.api.v1.model.input.EnderecoInputDto;
+import com.algaworks.algafood.api.v1.model.input.RestauranteInputDto;
 import com.algaworks.algafood.client.api.ClientApiException;
 import com.algaworks.algafood.client.api.RestauranteClient;
 
