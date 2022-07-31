@@ -33,7 +33,10 @@ import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 
+import lombok.extern.slf4j.Slf4j;
+
 @ControllerAdvice
+@Slf4j
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	private static final String MSG_ERRO_GENERICA_UI = "Ocorreu um erro interno inesperado no sistema. Tente novamente "
@@ -93,11 +96,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> handleGenericExecption(Exception e, WebRequest request){
-	
-		
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 		String detail  = MSG_ERRO_GENERICA_UI;
 		ProblemType  problemType = ProblemType.ERRO_DE_SISTEMA;
+		
+		log.error(e.getMessage(), e);
 		
 		Problem problem = createProblemBuilder(status, problemType, detail)
 				.userMessage(MSG_ERRO_GENERICA_UI)
