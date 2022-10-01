@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.algaworks.algafood.api.v1.JardaLinks;
 import com.algaworks.algafood.api.v1.controller.PedidoController;
 import com.algaworks.algafood.api.v1.model.PedidoResumoDto;
+import com.algaworks.algafood.core.security.SecurityUtils;
 import com.algaworks.algafood.domain.model.Pedido;
 
 @Component
@@ -20,24 +21,30 @@ public class PedidoResumoDtoAssembler extends RepresentationModelAssemblerSuppor
 	
 	@Autowired
 	private ModelMapper modelMapper;
-	
 	@Autowired
 	private JardaLinks jardaLinks;
-	
+	@Autowired
+	private SecurityUtils securityUtils;
 	
     @Override
 	public PedidoResumoDto toModel(Pedido pedido) {
 		PedidoResumoDto pedidoDto = createModelWithId(pedido.getCodigo(), pedido);
         modelMapper.map(pedido, pedidoDto);
         
-        pedidoDto.add(jardaLinks.linkToPedidos());
+        if(securityUtils.podePesquisarPedidos()) {
+        	pedidoDto.add(jardaLinks.linkToPedidos());
+        }
         
-        pedidoDto.getRestaurante().add(
-        		jardaLinks.linkToRestaurante(pedidoDto.getRestaurante().getId()));
+        if(securityUtils.podeConsultarRestaurantes()) {
+        	pedidoDto.getRestaurante().add(
+        			jardaLinks.linkToRestaurante(pedidoDto.getRestaurante().getId()));
+        }
         
-        pedidoDto.getCliente().add(
-        		jardaLinks.linkToUsuario(pedidoDto.getCliente().getId()));
-        
+        if(securityUtils.podeConsultarUsuariosGruposPermissoes()) {
+        	pedidoDto.getCliente().add(
+        			jardaLinks.linkToUsuario(pedidoDto.getCliente().getId()));
+        }
+
         return pedidoDto;
 	}
     

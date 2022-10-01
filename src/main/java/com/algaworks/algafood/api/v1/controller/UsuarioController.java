@@ -23,6 +23,7 @@ import com.algaworks.algafood.api.v1.model.UsuarioDto;
 import com.algaworks.algafood.api.v1.model.input.AlterarSenhaInputDto;
 import com.algaworks.algafood.api.v1.model.input.UsuarioInputComSenhaDto;
 import com.algaworks.algafood.api.v1.model.input.UsuarioInputDto;
+import com.algaworks.algafood.core.security.annotations.CheckSecurity;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.UsuarioRepository;
 import com.algaworks.algafood.domain.service.CadastroUsuarioService;
@@ -41,19 +42,22 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 	@Autowired
 	private UsuarioInputDtoDisassembler usuarioInputDtoDisassembler;
 
-	
+
+	@CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
 	@Override
 	@GetMapping
 	public CollectionModel<UsuarioDto> listar(){
 		return usuarioDtoAssembler.toCollectionModel(usuarioRepository.findAll());
 	}
 	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
 	@Override
 	@GetMapping("/{usuarioId}")
 	public UsuarioDto buscar(@PathVariable("usuarioId") Long id){
 		return usuarioDtoAssembler.toModel(cadastroUsuario.buscarOuFalhar(id));
 	}
 	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeEditar
 	@Override
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
@@ -62,10 +66,11 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 		return usuarioDtoAssembler.toModel(usuario);
 	}
 	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeAlterarUsuario
 	@Override
 	@PutMapping("/{usuarioId}")
-	public UsuarioDto editar(@PathVariable("usuarioId") Long id, @RequestBody @Valid UsuarioInputDto usuarioInputDto){
-		Usuario usuarioAtual = cadastroUsuario.buscarOuFalhar(id);
+	public UsuarioDto editar(@PathVariable("usuarioId") Long usuarioId, @RequestBody @Valid UsuarioInputDto usuarioInputDto){
+		Usuario usuarioAtual = cadastroUsuario.buscarOuFalhar(usuarioId);
 		
 		usuarioInputDtoDisassembler.copyToDomainObject(usuarioInputDto, usuarioAtual);
 		
@@ -74,14 +79,15 @@ public class UsuarioController implements UsuarioControllerOpenApi {
 		return usuarioDtoAssembler.toModel(usuarioAtual);
 	}
 	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeAlterarPropriaSenha
 	@Override
 	@PutMapping("/{usuarioId}/senha")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void alterarSenha(@PathVariable("usuarioId") Long id, @RequestBody @Valid AlterarSenhaInputDto alterarSenhaInput){
-		cadastroUsuario.alterarSenha(id, alterarSenhaInput.getNovaSenha(), alterarSenhaInput.getSenhaAtual());
+	public void alterarSenha(@PathVariable("usuarioId") Long usuarioId, @RequestBody @Valid AlterarSenhaInputDto alterarSenhaInput){
+		cadastroUsuario.alterarSenha(usuarioId, alterarSenhaInput.getNovaSenha(), alterarSenhaInput.getSenhaAtual());
 	}
 	
-	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeEditar
 	@Override
 	@DeleteMapping("/{usuarioId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)

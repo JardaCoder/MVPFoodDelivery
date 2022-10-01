@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.algaworks.algafood.api.v1.JardaLinks;
 import com.algaworks.algafood.api.v1.controller.RootEntryPointController.EstatisticasDto;
 import com.algaworks.algafood.api.v1.controller.openapi.controller.EstatisticasControllerOpenApi;
+import com.algaworks.algafood.core.security.annotations.CheckSecurity;
 import com.algaworks.algafood.domain.filter.VendaDiariaFilter;
 import com.algaworks.algafood.domain.model.dtos.VendaDiaria;
 import com.algaworks.algafood.domain.service.VendaQueryService;
@@ -32,13 +33,14 @@ public class EstatisticasController implements EstatisticasControllerOpenApi {
 	@Autowired
 	private JardaLinks jardaLinks;
  	
+	@CheckSecurity.Estatisticas.PodeConsultar
 	@Override
 	@GetMapping(path = "/vendas-diarias", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<VendaDiaria> consultarVendasDiarias(VendaDiariaFilter filtro, @RequestParam(required = false, defaultValue = "+00:00") String timeOffset){
 		return vendaQueryService.consultarVendasDiarias(filtro, timeOffset);
 	}
 	
-	
+	@CheckSecurity.Estatisticas.PodeConsultar
 	@Override
 	@GetMapping(path = "/vendas-diarias", produces = MediaType.APPLICATION_PDF_VALUE)
 	public ResponseEntity<byte[]> consultarVendasDiariasPdf(VendaDiariaFilter filtro, @RequestParam(required = false, defaultValue = "+00:00") String timeOffset){
@@ -54,7 +56,7 @@ public class EstatisticasController implements EstatisticasControllerOpenApi {
 				.body(bytesPdf);
 	}
 
-
+	@CheckSecurity.Estatisticas.PodeConsultar
 	@Override
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public EstatisticasDto estatisticas() {

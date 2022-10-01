@@ -11,7 +11,8 @@ public enum ProblemType {
 	RECURSO_NAO_ENCONTRADO("Recurso não encontrado", "/recurso-nao-encontrado"),
 	DADOS_INVALIDOS("Dados inválidos", "/dados-invalidos"),
 	ERRO_NEGOCIO("Violação de regra de negócio", "/erro-negocio"),
-	ERRO_DE_SISTEMA("Erro interno de sistema.", "/erro-interno");
+	ERRO_DE_SISTEMA("Erro interno de sistema.", "/erro-interno"),
+	ACESSO_NEGADO("Acesso negado", "/acesso-negado");
 	
 	
 	private String title;

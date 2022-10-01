@@ -32,6 +32,8 @@ JpaSpecificationExecutor<Restaurante> {
 	
 	@Query("FROM Restaurante r LEFT JOIN FETCH r.cozinha")
 	List<Restaurante> findAll();
+
+	boolean existsResponsavel(Long restauranteId, Long usuarioId);
 	
 	
 	

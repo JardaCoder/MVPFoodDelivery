@@ -22,6 +22,7 @@ import com.algaworks.algafood.api.v1.controller.openapi.controller.RestaurantePr
 import com.algaworks.algafood.api.v1.disassembler.ProdutoInputDtoDisassembler;
 import com.algaworks.algafood.api.v1.model.ProdutoDto;
 import com.algaworks.algafood.api.v1.model.input.ProdutoInputDto;
+import com.algaworks.algafood.core.security.annotations.CheckSecurity;
 import com.algaworks.algafood.domain.model.Produto;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.ProdutoRepository;
@@ -45,6 +46,7 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 	@Autowired
 	private JardaLinks jardaLinks;
 	
+	@CheckSecurity.Restaurantes.PodeConsultar
 	@Override
 	@GetMapping
 	public CollectionModel<ProdutoDto> listar(@PathVariable Long restauranteId, @RequestParam(required = false) Boolean incluirInativos){
@@ -62,6 +64,7 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 				.add(jardaLinks.linkToProdutos(restauranteId));
 	}
 	
+	@CheckSecurity.Restaurantes.PodeConsultar
 	@Override
 	@GetMapping("/{produtoId}")
 	public ProdutoDto buscar(@PathVariable Long restauranteId, @PathVariable Long produtoId){
@@ -70,6 +73,7 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 		return produtoDtoAssembler.toModel(produto);
 	}
 	
+	@CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
 	@Override
 	@PostMapping
 	public ProdutoDto criar(@PathVariable Long restauranteId, @RequestBody @Valid ProdutoInputDto produtoInput){
@@ -81,7 +85,7 @@ public class RestauranteProdutoControlller implements RestauranteProdutoControll
 		return produtoDtoAssembler.toModel(cadastroProduto.salvar(produto));
 	}
 	
-	
+	@CheckSecurity.Restaurantes.PodeGerenciarFuncionamento
 	@Override
 	@PutMapping("/{produtoId}")
 	public ProdutoDto editar(@PathVariable Long produtoId, @PathVariable Long restauranteId, @RequestBody @Valid ProdutoInputDto produtoInput){

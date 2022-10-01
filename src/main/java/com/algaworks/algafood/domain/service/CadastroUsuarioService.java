@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,8 @@ public class CadastroUsuarioService {
 	private UsuarioRepository usuarioRepository;
 	@Autowired
 	private CadastroGrupoService cadastroGrupoService;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@Transactional
 	public Usuario salvar(Usuario usuario) {
@@ -39,6 +42,9 @@ public class CadastroUsuarioService {
 		if(usuarioExistente.isPresent() && !usuarioExistente.get().equals(usuario)) {
 			throw new NegocioException(String.format(MSG_EMAIL_EM_USO, usuario.getEmail()));
 		}
+		
+		if(usuario.isNew())
+			usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
 		
 		return usuarioRepository.save(usuario);
 	}
@@ -68,11 +74,10 @@ public class CadastroUsuarioService {
 	public void alterarSenha(Long usuarioId, String novaSenha, String senhaAtual) {
 		Usuario usuario = buscarOuFalhar(usuarioId);
 		
-		if(! usuario.getSenha().equals(senhaAtual)) {
+		if(!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
 			throw new NegocioException(MSG_SENHA_NAO_CORRESPONDE);
 		}
-		
-		usuario.setSenha(novaSenha);
+		usuario.setSenha(passwordEncoder.encode(novaSenha));
 	}
 	
 	@Transactional

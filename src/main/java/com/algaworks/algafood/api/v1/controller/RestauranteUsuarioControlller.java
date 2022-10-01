@@ -14,6 +14,8 @@ import com.algaworks.algafood.api.v1.JardaLinks;
 import com.algaworks.algafood.api.v1.assembler.UsuarioDtoAssembler;
 import com.algaworks.algafood.api.v1.controller.openapi.controller.RestauranteUsuarioControllerOpenApi;
 import com.algaworks.algafood.api.v1.model.UsuarioDto;
+import com.algaworks.algafood.core.security.SecurityUtils;
+import com.algaworks.algafood.core.security.annotations.CheckSecurity;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 
@@ -27,7 +29,10 @@ public class RestauranteUsuarioControlller implements RestauranteUsuarioControll
 	private UsuarioDtoAssembler usuarioDtoAssembler;
 	@Autowired
 	private JardaLinks jardaLinks;
+	@Autowired
+	private SecurityUtils securityUtils;
 
+	@CheckSecurity.Restaurantes.PodeConsultar
 	@Override
 	@GetMapping
 	public CollectionModel<UsuarioDto> listar(@PathVariable Long restauranteId) {
@@ -36,19 +41,24 @@ public class RestauranteUsuarioControlller implements RestauranteUsuarioControll
 		
 		CollectionModel<UsuarioDto> usuarios =  usuarioDtoAssembler
 				.toCollectionModel(restaurante.getResponsaveis())
-				.removeLinks()
-				.add(jardaLinks.linkToResponsaveisRestaurante(restauranteId))
-				.add(jardaLinks.linkToRestauranteResponsavelAssociacao(restauranteId, "associar"));
+				.removeLinks();
 		
-		usuarios.getContent().forEach(usuario ->{
-			usuario.add(jardaLinks
-					.linkToRestauranteResponsavelDesassociacao(
-							restauranteId, usuario.getId(), "desassociar"));
-		});
+		usuarios.add(jardaLinks.linkToResponsaveisRestaurante(restauranteId));
+		
+		if(securityUtils.podeGerenciarCadastroRestaurantes()) {
+			usuarios.add(jardaLinks.linkToRestauranteResponsavelAssociacao(restauranteId, "associar"));
+			
+			usuarios.getContent().forEach(usuario ->{
+				usuario.add(jardaLinks
+						.linkToRestauranteResponsavelDesassociacao(
+								restauranteId, usuario.getId(), "desassociar"));
+			});
+		}
 		
 		return usuarios;
 	}
 
+	@CheckSecurity.Restaurantes.PodeGerenciarCadastro
 	@Override
 	@DeleteMapping("/{usuarioId}")
 	public ResponseEntity<Void> desassociar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {
@@ -57,6 +67,7 @@ public class RestauranteUsuarioControlller implements RestauranteUsuarioControll
 		return ResponseEntity.noContent().build();
 	}
 
+	@CheckSecurity.Restaurantes.PodeGerenciarCadastro
 	@Override
 	@PutMapping("/{usuarioId}")
 	public ResponseEntity<Void> associar(@PathVariable Long restauranteId, @PathVariable Long usuarioId) {

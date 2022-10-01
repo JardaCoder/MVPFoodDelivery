@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.algaworks.algafood.api.v1.JardaLinks;
 import com.algaworks.algafood.api.v1.controller.CidadeController;
 import com.algaworks.algafood.api.v1.model.CidadeDto;
+import com.algaworks.algafood.core.security.SecurityUtils;
 import com.algaworks.algafood.domain.model.Cidade;
 
 @Component
@@ -20,9 +21,10 @@ public class CidadeDtoAssembler extends RepresentationModelAssemblerSupport<Cida
 
 	@Autowired
 	private ModelMapper modelMapper;
-	
 	@Autowired
 	private JardaLinks jardaLinks;
+	@Autowired
+	private SecurityUtils securityUtils;
 	
 	@Override
 	public CidadeDto toModel(Cidade cidade) {
@@ -31,19 +33,28 @@ public class CidadeDtoAssembler extends RepresentationModelAssemblerSupport<Cida
 		
 		modelMapper.map(cidade, cidadeDto);
 		
-		cidadeDto.add(
-				jardaLinks.linkToCidades("cidades"));
-		
-		cidadeDto.getEstado().add(
-				jardaLinks.linkToEstado(cidade.getEstado().getId()));
+	    if (securityUtils.podeConsultarCidades()) {
+			cidadeDto.add(
+					jardaLinks.linkToCidades("cidades"));
+	    }
+	    
+	    if (securityUtils.podeConsultarEstados()) {
+			cidadeDto.getEstado().add(
+					jardaLinks.linkToEstado(cidade.getEstado().getId()));
+	    }
 		
 		return cidadeDto;
 	}
 	
 	@Override
 	public CollectionModel<CidadeDto> toCollectionModel(Iterable<? extends Cidade> entities) {
-		return super.toCollectionModel(entities)
-				.add(jardaLinks.linkToCidades());
+	    CollectionModel<CidadeDto> collectionModel = super.toCollectionModel(entities);
+	    
+	    if (securityUtils.podeConsultarCidades()) {
+	        collectionModel.add(jardaLinks.linkToCidades());
+	    }
+	    
+	    return collectionModel;
 	}
 	
 }

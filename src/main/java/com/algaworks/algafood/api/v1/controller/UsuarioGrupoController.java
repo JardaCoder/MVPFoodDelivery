@@ -14,6 +14,8 @@ import com.algaworks.algafood.api.v1.JardaLinks;
 import com.algaworks.algafood.api.v1.assembler.GrupoDtoAssembler;
 import com.algaworks.algafood.api.v1.controller.openapi.controller.UsuarioGrupoControllerOpenApi;
 import com.algaworks.algafood.api.v1.model.GrupoDto;
+import com.algaworks.algafood.core.security.SecurityUtils;
+import com.algaworks.algafood.core.security.annotations.CheckSecurity;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.PermissaoRepository;
 import com.algaworks.algafood.domain.service.CadastroGrupoService;
@@ -34,27 +36,30 @@ public class UsuarioGrupoController implements UsuarioGrupoControllerOpenApi {
 	private GrupoDtoAssembler grupoDtoAssembler;
 	@Autowired
 	private JardaLinks jardaLinks;    
+	@Autowired
+	private SecurityUtils securityUtils;
 
-	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeConsultar
 	@Override
 	@GetMapping
 	public CollectionModel<GrupoDto> listar(@PathVariable Long usuarioId){
 	    Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
-	    
-	    
 	    CollectionModel<GrupoDto> grupos = grupoDtoAssembler.toCollectionModel(usuario.getGrupos())
-	            .removeLinks()
-	            .add(jardaLinks.linkToUsuarioGrupoAssociacao(usuarioId, "associar"));
+	            .removeLinks();
 	    
-	    
-	    grupos.getContent().forEach(grupoModel -> {
-	        grupoModel.add(jardaLinks.linkToUsuarioGrupoDesassociacao(
-	                usuarioId, grupoModel.getId(), "desassociar"));
-	    });
-	    
+	    if (securityUtils.podeEditarUsuariosGruposPermissoes()) {
+	    	grupos.add(jardaLinks.linkToUsuarioGrupoAssociacao(usuarioId, "associar"));
+	        
+		    grupos.getContent().forEach(grupoModel -> {
+		        grupoModel.add(jardaLinks.linkToUsuarioGrupoDesassociacao(
+		                usuarioId, grupoModel.getId(), "desassociar"));
+		    });
+	    }
+
 	    return grupos;
 	}
 	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeEditar
 	@Override
 	@DeleteMapping("/{grupoId}")
 	public ResponseEntity<Void> desassociar(@PathVariable Long usuarioId, @PathVariable Long grupoId){
@@ -63,6 +68,7 @@ public class UsuarioGrupoController implements UsuarioGrupoControllerOpenApi {
 		return ResponseEntity.noContent().build();
 	}
 	
+	@CheckSecurity.UsuariosGruposPermissoes.PodeEditar
 	@Override
 	@PutMapping("/{grupoId}")
 	public ResponseEntity<Void> associar(@PathVariable Long usuarioId, @PathVariable Long grupoId){

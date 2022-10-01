@@ -25,7 +25,7 @@ public class EmailPedidoCanceladoListener {
 		
 		var mensagem = Mensagem.builder()
 			.assunto(pedido.getRestaurante().getNome() + " - Pedido cancelado")
-			.corpo("pedido-cancelado.html")
+			.corpo("emails/pedido-cancelado.html")
 			.destinatario(pedido.getCliente().getEmail())
 			.variavel("pedido", pedido)
 			.build();

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.algaworks.algafood.api.v1.JardaLinks;
 import com.algaworks.algafood.api.v1.controller.RestauranteController;
 import com.algaworks.algafood.api.v1.model.RestauranteBasicoDto;
+import com.algaworks.algafood.core.security.SecurityUtils;
 import com.algaworks.algafood.domain.model.Restaurante;
 
 @Component
@@ -22,9 +23,10 @@ public class RestauranteBasicoDtoAssembler
     
 	@Autowired
 	private ModelMapper modelMapper;
-	
 	@Autowired
 	private JardaLinks jardaLinks;
+	@Autowired
+	private SecurityUtils securityUtils;
 	
 	@Override
 	public RestauranteBasicoDto toModel(Restaurante restaurante) {
@@ -32,12 +34,17 @@ public class RestauranteBasicoDtoAssembler
                 restaurante.getId(), restaurante);
 		
 		 modelMapper.map(restaurante, restauranteDto);
+		 
+		 if(securityUtils.podeConsultarRestaurantes()) {
+			 restauranteDto.add(jardaLinks.linkToRestaurantes("restaurantes"));
+		 }
+		 
+		 if(securityUtils.podeConsultarCozinhas()) {
+			 restauranteDto.getCozinha().add(
+					 jardaLinks.linkToCozinha(restaurante.getCozinha().getId()));
+		 }
 
-		 restauranteDto.add(jardaLinks.linkToRestaurantes("restaurantes"));
-        
-		 restauranteDto.getCozinha().add(
-        		jardaLinks.linkToCozinha(restaurante.getCozinha().getId()));
-		
+		 
 		 return restauranteDto;
 	}
 	

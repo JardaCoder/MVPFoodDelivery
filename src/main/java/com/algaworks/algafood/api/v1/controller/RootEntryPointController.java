@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.api.v1.JardaLinks;
+import com.algaworks.algafood.core.security.SecurityUtils;
 
 import io.swagger.annotations.Api;
 
@@ -19,22 +20,47 @@ public class RootEntryPointController {
 	
 	@Autowired
 	private JardaLinks jardaLinks;
+	@Autowired
+	private SecurityUtils securityUtils;
 	
 	@GetMapping
 	public RooEntryPointDto root() {
 		var rootEntryPointDto = new RooEntryPointDto();
 		
-		rootEntryPointDto.add(jardaLinks.linkToCozinhas("cozinhas"));
-		rootEntryPointDto.add(jardaLinks.linkToPedidos("pedidos"));
-		rootEntryPointDto.add(jardaLinks.linkToRestaurantes("restaurantes"));
-		rootEntryPointDto.add(jardaLinks.linkToGrupos("grupos"));
-		rootEntryPointDto.add(jardaLinks.linkToUsuarios("usuarios"));
-		rootEntryPointDto.add(jardaLinks.linkToPermissoes("permissoes"));
-		rootEntryPointDto.add(jardaLinks.linkToFormasPagamento("formas-pagamento"));
-		rootEntryPointDto.add(jardaLinks.linkToEstados("estados"));
-		rootEntryPointDto.add(jardaLinks.linkToCidades("cidades"));
-		rootEntryPointDto.add(jardaLinks.linkToEstatisticas("estatisticas"));
+		if(securityUtils.podeConsultarCozinhas()) {
+			rootEntryPointDto.add(jardaLinks.linkToCozinhas("cozinhas"));
+		}
 		
+		if(securityUtils.podePesquisarPedidos()) {
+			rootEntryPointDto.add(jardaLinks.linkToPedidos("pedidos"));
+		}
+		
+		if(securityUtils.podeConsultarRestaurantes()) {
+			rootEntryPointDto.add(jardaLinks.linkToRestaurantes("restaurantes"));
+		}
+		
+		if(securityUtils.podeConsultarUsuariosGruposPermissoes()) {
+			rootEntryPointDto.add(jardaLinks.linkToGrupos("grupos"));
+			rootEntryPointDto.add(jardaLinks.linkToUsuarios("usuarios"));
+			rootEntryPointDto.add(jardaLinks.linkToPermissoes("permissoes"));
+		}
+		
+		if(securityUtils.podeConsultarFormasPagamento()) {
+			rootEntryPointDto.add(jardaLinks.linkToFormasPagamento("formas-pagamento"));
+		}
+		
+		if(securityUtils.podeConsultarEstados()) {
+			rootEntryPointDto.add(jardaLinks.linkToEstados("estados"));
+		}
+		
+		if(securityUtils.podeConsultarCidades()) {
+			rootEntryPointDto.add(jardaLinks.linkToCidades("cidades"));
+		}
+		
+		if(securityUtils.podeConsultarEstatisticas()) {
+			rootEntryPointDto.add(jardaLinks.linkToEstatisticas("estatisticas"));
+		}
+ 		
 		return rootEntryPointDto;
 	}
 	

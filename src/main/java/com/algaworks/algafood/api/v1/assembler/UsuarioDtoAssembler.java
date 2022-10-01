@@ -1,7 +1,5 @@
 package com.algaworks.algafood.api.v1.assembler;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -11,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.algaworks.algafood.api.v1.JardaLinks;
 import com.algaworks.algafood.api.v1.controller.UsuarioController;
 import com.algaworks.algafood.api.v1.model.UsuarioDto;
+import com.algaworks.algafood.core.security.SecurityUtils;
 import com.algaworks.algafood.domain.model.Usuario;
 
 @Component
@@ -22,9 +21,10 @@ public class UsuarioDtoAssembler extends RepresentationModelAssemblerSupport<Usu
 
 	@Autowired
 	private ModelMapper modelMapper;
-	
 	@Autowired
 	private JardaLinks jardaLinks;
+	@Autowired
+	private SecurityUtils securityUtils;
 	
 	@Override
 	public UsuarioDto toModel(Usuario usuario) {
@@ -34,11 +34,13 @@ public class UsuarioDtoAssembler extends RepresentationModelAssemblerSupport<Usu
 		
 		modelMapper.map(usuario, ususarioDto);
 		
-		ususarioDto.add(
-				jardaLinks.linkToUsuarios("usuarios"));
-		
-		ususarioDto.add(
-				jardaLinks.linkToGruposUsuario(usuario.getId(), "grupos-usuario"));
+		if(securityUtils.podeConsultarUsuariosGruposPermissoes()) {
+			ususarioDto.add(
+					jardaLinks.linkToUsuarios("usuarios"));
+			
+			ususarioDto.add(
+					jardaLinks.linkToGruposUsuario(usuario.getId(), "grupos-usuario"));
+		}
 		
 		return ususarioDto;
 	}
