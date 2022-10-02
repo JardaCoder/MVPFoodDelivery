@@ -1,0 +1,45 @@
+version: "3.3"
+
+networks:
+  jardafood-network:
+    driver: bridge
+
+services:
+  jardafood-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    networks:
+      - jardafood-network
+
+
+  jardafood-redis:
+    image: redis:6.2.1-alpine
+    networks:
+      - jardafood-network
+      
+  jardafood-api:
+    image: jardafood-api
+    command: ["/wait-for-it.sh", "jardafood-mysql:3306", "-t", "30", "--", "java", "-jar", "api.jar"]
+    environment:
+      DB_HOST: jardafood-mysql
+      SPRING_SESSION_STORE_TYPE: redis
+      SPRING_REDIS_HOST: jardafood-redis
+    networks:
+      - jardafood-network
+    depends_on:
+      - jardafood-mysql
+
+  jardafood-proxy:
+    build: ./nginx
+    image: jardafood-proxy
+    ports:
+      - "80:80"
+    networks:
+      - jardafood-network
+    depends_on:
+      - jardafood-api
+      
+  
