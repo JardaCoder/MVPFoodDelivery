@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 @Validated
@@ -20,10 +19,8 @@ public class EmailProperties {
 	@NotNull
 	private String remetente;
 	
-	@NonNull
 	private String emailSandbox;
 	
-	@NonNull
 	private TipoEmail tipo = TipoEmail.FAKE;
 	
 	

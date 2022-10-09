@@ -88,10 +88,10 @@ public class RestauranteProdutoFotoControlller implements RestauranteProdutoFoto
 			@PathVariable Long produtoId, @RequestHeader(name = "accept") String acceptHeader) throws IOException, HttpMediaTypeNotAcceptableException {
 		
 		try {
-			var foto = catalogoFotoProdutoService.buscarOuFalhar(produtoId, restauranteId);
+			var foto = catalogoFotoProdutoService.buscarOuFalhar(restauranteId, produtoId);
 			
 			MediaType mediaTypeFoto = MediaType.parseMediaType(foto.getContentType());
-			List<MediaType> mediaTypesAceitas = MediaType.parseMediaTypes(acceptHeader);
+ 			List<MediaType> mediaTypesAceitas = MediaType.parseMediaTypes(acceptHeader);
 
 			MediaTypeUtils.verificarCompatibilidadesMediaType(mediaTypeFoto, mediaTypesAceitas);
 			

@@ -17,7 +17,8 @@ public interface ProdutoRepository extends CustomJpaRepository<Produto, Long>, P
 	List<Produto> findAtivosByRestaurante(Restaurante restaurante);
 	
 	
-	@Query("SELECT f FROM FotoProduto f JOIN f.produto p  WHERE f.produto.id = :produtoId AND p.restaurante.id = :restauranteId")
+	@Query("select f from FotoProduto f join f.produto p "
+			+ "where p.restaurante.id = :restauranteId and f.produto.id = :produtoId")
 	Optional<FotoProduto> findFotoById(Long restauranteId, Long produtoId);
 
 

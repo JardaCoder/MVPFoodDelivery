@@ -10,10 +10,9 @@ services:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
-      - "3306:3306"
+      - "13306:3306"
     networks:
       - jardafood-network
-
 
   jardafood-redis:
     image: redis:6.2.1-alpine
@@ -27,6 +26,7 @@ services:
       DB_HOST: jardafood-mysql
       SPRING_SESSION_STORE_TYPE: redis
       SPRING_REDIS_HOST: jardafood-redis
+      SPRING_PROFILES_ACTIVE: dev
     networks:
       - jardafood-network
     depends_on:
